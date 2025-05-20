@@ -3,12 +3,13 @@
 let main(_) : Unit -> Unit =
     let sum : Int = 5 + -3 ;
     print(sum) ;
+    print(sum) ;
 
     let difference : Int = -10 - 2 ;
-    print(difference) ; 
+    print(difference) ;
     
     let product : Int = 4 * 5^0 ;
-    print(product) ; 
+    print(product) ;
 
     let quotient : Int = 20 / 3 ;
     print(quotient) ;

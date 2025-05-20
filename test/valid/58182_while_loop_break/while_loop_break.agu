@@ -10,7 +10,7 @@ let main(_) : Unit -> Unit =
         if i == breakCondition then
             set flag = false
         else (
-            print(i) ; 
+            print(i) ;
             set i = i + 1
         )
     )
