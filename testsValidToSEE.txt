@@ -1,0 +1,28 @@
+
+
+no teste 64371_reverse_array/reverse_array.agu O COMPILADOR DO STOR OBTEM X MAS O FICHEIRO ESTÁ CORRETO!
+/Users/ricardo/Desktop/fcul/Técnicas de Compilação/aguda-testing/test/valid/tcomp000_assoc_eq/assoc_eq.agu
+O COMPILADOR DO STOR OBTEM certo MAS O FICHEIRO tem um erro sintático pois == e != não são associativos como em java!
+
+
+PROBLEMA DO LET _ UNIT =... ;  Dá para resolver estes problemas mas depois tenho um erro de escopo no validator que nao consigo resolver, dentro de whiels e ifs
+tcomp000_collatz/collatz.agu
+test/valid/56311_empty_array/empty_array.agu
+test/valid/64361_greatest_common_divisor/greatest_common_divisor.agu
+test/valid/64361_fibonacci/fibonacci.agu
+test/valid/64361_factorial/factorial.agu
+test/valid/58185_string_concatenation/string_concatenation.agu
+test/valid/58185_simple_arithmetic/simple_arithmetic.agu
+test/valid/58185_sequencing/sequencing.agu
+test/valid/58185_power_operator/power_operator.agu
+test/valid/58185_mutual_recursion/mutual_recursion.agu
+test/valid/58185_boolean_logic/boolean_logic.agu
+test/valid/58170_sameNameVar/sameNameVar.agu
+test/valid/58170_pyramid/pyramid.agu
+test/valid/58170_categorizeNumbers/categorizeNumbers.agu
+test/valid/58166_pingPong/pingPong.agu
+
+
+nos invalid o unico problema é com:
+test/invalid-semantic/64854_adding_string_int/adding_string_int.agu
+problema com ; que é possóvel resolver mas depois destroi a comunicação entre o parser e o validator que tinha antes

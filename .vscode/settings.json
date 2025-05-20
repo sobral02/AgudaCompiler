@@ -1,0 +1,4 @@
+{
+  "dafny-autopilot.enableDevelopmentFeatures": false,
+  "python.analysis.extraPaths": ["./src/aguda-cabal/aguda"]
+}

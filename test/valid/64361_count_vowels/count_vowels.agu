@@ -1,0 +1,20 @@
+-- Author: fc64361, Gustavo Henriques
+
+let count_vowels (str, size) : (String[], Int) -> Int =
+    let count : Int = 0;
+    let i : Int = 0;
+    while i < size do (
+        let ch : String = str[i];
+        if ch == "a" || ch == "e" || ch == "i" || ch == "o" || ch == "u" then (
+            set count = count + 1
+        );
+        set i = i + 1
+    );
+    count
+
+let main(_) : Unit -> Unit =
+    let word : String[] = new String[5 | "h"; "e"; "l"; "l"; "o"];
+    print(count_vowels(word, 5));  -- Should print 2
+
+    let sentence : String[] = new String[16 | "c"; "o"; "m"; "p"; "i"; "l"; "i"; "n"; "g"; " "; "i"; "s"; " "; "f"; "u"; "n"];
+    print(count_vowels(sentence, 16))  -- Should print 5

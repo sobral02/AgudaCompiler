@@ -1,0 +1,29 @@
+associativity.agu: ❌ ERROR (esperado ✘, obtido ✔) --- o prof esta mal
+test/valid/56269_associativity/associativity.agu 
+
+boolean.agu: ❌ ERROR (esperado ✘, obtido ✔) --- esta bem o prof
+test/valid/61015_boolean/boolean.agu
+
+count_vowels.agu: ❌ ERROR (esperado ✔, obtido ✘) --- esta mal o prof
+test/valid/64361_count_vowels/count_vowels.agu 
+
+empty_array.agu: ❌ ERROR (esperado ✘, obtido ✔)
+test/valid/56311_empty_array/empty_array.agu
+
+high_order_func_type.agu: ❌ ERROR (esperado ✘, obtido ✔) -- esta mal o prof
+test/valid/56311_high_order_function_type/high_order_func_type.agu
+
+if_then_if.agu: ❌ ERROR (esperado MISSING, obtido ✔) -- talvez o prof esteja bem
+test/valid/tcomp000_if_then_if/if_then_if.agu 
+
+index_of.agu: ❌ ERROR (esperado ✔, obtido ✘) --- prof esta mal
+test/valid/64371_index_of/index_of.agu 
+
+minArrAndElseUnit.agu: ❌ ERROR (esperado ✔, obtido ✘) ----prof esta mal
+test/valid/58215_minArrAndElseUnit/minArrAndElseUnit.agu 
+
+recursive_factorial.agu: ❌ ERROR (esperado ✘, obtido ✔)  --- prof está mal
+test/valid/46494_recursive_factorial/recursive_factorial.agu
+
+variables.agu: ❌ ERROR (esperado ✘, obtido ✔) ---prof esta mal
+test/valid/56269_variables/variables.agu 

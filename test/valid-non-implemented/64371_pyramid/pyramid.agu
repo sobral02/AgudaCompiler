@@ -1,0 +1,23 @@
+-- Author: 64371, Ricardo Costa
+
+-- prints a string n times
+let printStr(str, n): (Int, Int) -> Unit =
+    let i: Int = 0;
+    while i < n do (
+        print(str);
+        set i = i + 1
+    )
+
+-- prints a pyramid of * with variable height
+let printPyramid(height): Int -> Unit =
+    let i: Int = 0;
+    while i < height do (
+        let spaces: Int = height - i - 1;
+        let stars: Int = 2 * i + 1;
+        printStr(0, spaces);
+        printStr(1, stars);
+        print(2);
+        set i = i + 1
+    )
+
+let main (_): Unit -> Unit = printPyramid(5) -- prints a pyramid of height 5
