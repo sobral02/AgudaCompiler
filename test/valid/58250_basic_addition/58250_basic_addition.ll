@@ -2,8 +2,6 @@
 target triple = "arm64-apple-darwin22.6.0"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
 
-@"a" = internal global i32 5
-@"b" = internal global i32 10
 define void @"aguda_main"()
 {
 entry:
@@ -15,6 +13,8 @@ entry:
   ret void
 }
 
+@"a" = internal global i32 5
+@"b" = internal global i32 10
 declare i32 @"printf"(i8* %".1", ...)
 
 @".printf_fmt_int" = internal constant [3 x i8] c"%d\00"

@@ -188,16 +188,20 @@ class LLVMCodeGenerator:
         print(f"DEBUG: generate_FunDecl - tipo de retorno LLVM: {llvm_return_type}")
 
         fnty = ir.FunctionType(llvm_return_type, llvm_param_types)
-        # Evitar conflito se o nome for 'main' (função AGUDA)
         llvm_func_name = func_name if func_name != "main" else "aguda_main"
-        func = ir.Function(self.module, fnty, name=llvm_func_name)
+
+        # Se já existe (pré-declarada), reutiliza
+        func = self.func_symtab.get(func_name)
+        if func is None:
+            func = ir.Function(self.module, fnty, name=llvm_func_name)
+            self.func_symtab[func_name] = func
 
 
         # Nomear apenas os argumentos válidos (não-Unit)
         for llvm_arg, arg_name in zip(func.args, param_map):
             llvm_arg.name = arg_name
 
-        self.func_symtab[func_name] = func
+        
         
 
         # Criar o bloco inicial e preparar o builder
@@ -220,6 +224,8 @@ class LLVMCodeGenerator:
 
         self.current_function_return_type = node.expr.inferred_type
         body_val = self.generate_code(node.expr)
+        print(f"[DEBUG] Função {node.name} → body_val = {body_val}, tipo: {getattr(body_val, 'type', 'None')}")
+
         print(f"DEBUG: body_val da função '{func_name}' = {body_val}")
         print(f"DEBUG: bloco atual terminado? {self.builder.block.is_terminated}")
 
@@ -1062,7 +1068,24 @@ def generate_llvm_code(ast_root, validator_instance, output_filename):
 
     print("DEBUG: func_symtab antes da geração de funções:", code_generator.func_symtab)  # PRINT 13
 
-    
+    # PRÉ-REGISTAR TODAS AS FUNÇÕES NO func_symtab 
+    # ESSENCIAL PARA O CASO DAS FUNÇÕES RECURSIVAS QUE AINDA NÃO FORAM DECLARADAS
+    for decl in ast_root.declarations:
+        if isinstance(decl, aguda_ast.FunDecl):
+            func_name = decl.name
+            validated_func_info = validator_instance.functions.get(func_name)
+            if not validated_func_info:
+                continue  # Isso não deve acontecer se o validador estiver correto
+            aguda_param_types, aguda_return_type = validated_func_info
+            llvm_param_types = [code_generator.get_llvm_type(t)
+                                for t in aguda_param_types
+                                if not isinstance(code_generator.get_llvm_type(t), ir.VoidType)]
+            llvm_return_type = code_generator.get_llvm_type(aguda_return_type)
+            fnty = ir.FunctionType(llvm_return_type, llvm_param_types)
+            llvm_func_name = func_name if func_name != "main" else "aguda_main"
+            func = ir.Function(code_generator.module, fnty, name=llvm_func_name)
+            code_generator.func_symtab[func_name] = func
+
 
      # Primeiro, gerar código para todas as declarações globais (VarDecls)
     for decl in ast_root.declarations:
@@ -1070,12 +1093,11 @@ def generate_llvm_code(ast_root, validator_instance, output_filename):
             code_generator.generate_code(decl)
             
     print("DEBUG: func_symtab depois da geração de funções:", code_generator.func_symtab)  # PRINT 14
-   
-
-    # Agora, gerar código para todas as funções (FunDecls)
+   # Gerar os corpos das funções
     for decl in ast_root.declarations:
         if isinstance(decl, aguda_ast.FunDecl):
             code_generator.generate_code(decl)
+
         
     # Depois, criar a função 'main' do LLVM que pode chamar a 'main' da AGUDA
     # ou executar outra lógica para determinar o valor de saída do programa.

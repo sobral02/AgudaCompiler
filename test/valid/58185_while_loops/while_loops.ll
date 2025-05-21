@@ -42,9 +42,6 @@ loop.end.1:
   br label %"loop.cond"
 }
 
-declare i32 @"printf"(i8* %".1", ...)
-
-@".printf_fmt_int" = internal constant [3 x i8] c"%d\00"
 define void @"aguda_main"()
 {
 entry:
@@ -52,6 +49,9 @@ entry:
   ret void
 }
 
+declare i32 @"printf"(i8* %".1", ...)
+
+@".printf_fmt_int" = internal constant [3 x i8] c"%d\00"
 define i32 @"wrapper_main"()
 {
 entry:

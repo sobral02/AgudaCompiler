@@ -10,9 +10,6 @@ entry:
   ret void
 }
 
-declare i32 @"printf"(i8* %".1", ...)
-
-@".str_unit" = internal constant [6 x i8] c"unit\0a\00"
 define void @"aguda_main"()
 {
 entry:
@@ -20,6 +17,9 @@ entry:
   ret void
 }
 
+declare i32 @"printf"(i8* %".1", ...)
+
+@".str_unit" = internal constant [6 x i8] c"unit\0a\00"
 define i32 @"wrapper_main"()
 {
 entry:

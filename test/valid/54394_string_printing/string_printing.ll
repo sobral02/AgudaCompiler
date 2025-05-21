@@ -37,10 +37,6 @@ print_end:
   br label %"loop.cond"
 }
 
-declare i32 @"printf"(i8* %".1", ...)
-
-@".str_true" = internal constant [5 x i8] c"true\00"
-@".str_false" = internal constant [6 x i8] c"false\00"
 define void @"aguda_main"()
 {
 entry:
@@ -48,6 +44,10 @@ entry:
   ret void
 }
 
+declare i32 @"printf"(i8* %".1", ...)
+
+@".str_true" = internal constant [5 x i8] c"true\00"
+@".str_false" = internal constant [6 x i8] c"false\00"
 define i32 @"wrapper_main"()
 {
 entry:

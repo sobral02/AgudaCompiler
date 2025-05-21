@@ -380,10 +380,6 @@ expected: -1712324607
 captured: 479001600
 expected: 479001600
 
-  /Users/vv/workspace/tcomp/aguda-testing/test/valid/tcomp000_rec_fact/tcomp000_rec_fact.agu [✔]
-captured: 18
-expected: 18
-
   /Users/vv/workspace/tcomp/aguda-testing/test/valid/tcomp000_sumThree/sumThree.agu [✔]
 
 Failures:

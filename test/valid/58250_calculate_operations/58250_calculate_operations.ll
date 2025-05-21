@@ -2,11 +2,6 @@
 target triple = "arm64-apple-darwin22.6.0"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
 
-@"x" = internal global i32 1
-@"y" = internal global i32 2
-@"z" = internal global i32 3
-@"w" = internal global i32 4
-@"v" = internal global i32 5
 define i32 @"calculate_operations"(i32 %"a", i32 %"b", i32 %"c", i32 %"d", i32 %"e")
 {
 entry:
@@ -77,6 +72,11 @@ entry:
   ret void
 }
 
+@"x" = internal global i32 1
+@"y" = internal global i32 2
+@"z" = internal global i32 3
+@"w" = internal global i32 4
+@"v" = internal global i32 5
 declare i32 @"printf"(i8* %".1", ...)
 
 @".printf_fmt_int" = internal constant [3 x i8] c"%d\00"
