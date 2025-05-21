@@ -43,6 +43,12 @@ entry:
   %"g_call.1" = call i32 @"g"(i32 %"h_call.1")
   %"f_call.1" = call i32 @"f"(i32 %"g_call.1")
   store i32 %"f_call.1", i32* %"result"
+  %"h_call.2" = call i32 @"h"(i32 5)
+  %"g_call.2" = call i32 @"g"(i32 %"h_call.2")
+  %"f_call.2" = call i32 @"f"(i32 %"g_call.2")
+  %"h_call.3" = call i32 @"h"(i32 %"f_call.2")
+  %"g_call.3" = call i32 @"g"(i32 %"h_call.3")
+  %"f_call.3" = call i32 @"f"(i32 %"g_call.3")
   %"result_val" = load i32, i32* %"result"
   %"fmtptr" = getelementptr [3 x i8], [3 x i8]* @".printf_fmt_int", i32 0, i32 0
   %"printf_call" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr", i32 %"result_val")

@@ -39,6 +39,9 @@ entry:
   %"b_val" = load i32, i32* %"b"
   %"gcd_call" = call i32 @"gcd"(i32 %"a_val", i32 %"b_val")
   store i32 %"gcd_call", i32* %"res"
+  %"a_val.1" = load i32, i32* %"a"
+  %"b_val.1" = load i32, i32* %"b"
+  %"gcd_call.1" = call i32 @"gcd"(i32 %"a_val.1", i32 %"b_val.1")
   %"res_val" = load i32, i32* %"res"
   %"fmtptr" = getelementptr [3 x i8], [3 x i8]* @".printf_fmt_int", i32 0, i32 0
   %"printf_call" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr", i32 %"res_val")

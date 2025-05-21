@@ -44,6 +44,43 @@ pow_loop_body.1:
 pow_loop_end.1:
   %"pow_result_val.1" = load i32, i32* %"pow_result.1"
   store i32 %"pow_result_val.1", i32* %"i"
+  %"negtmp.1" = sub i32 0, 3
+  %"pow_result.2" = alloca i32
+  store i32 1, i32* %"pow_result.2"
+  %"pow_counter.2" = alloca i32
+  store i32 2, i32* %"pow_counter.2"
+  br label %"pow_loop_cond.2"
+pow_loop_cond.2:
+  %".30" = load i32, i32* %"pow_counter.2"
+  %".31" = icmp sgt i32 %".30", 0
+  br i1 %".31", label %"pow_loop_body.2", label %"pow_loop_end.2"
+pow_loop_body.2:
+  %".33" = load i32, i32* %"pow_result.2"
+  %".34" = mul i32 %".33", %"negtmp.1"
+  store i32 %".34", i32* %"pow_result.2"
+  %".36" = sub i32 %".30", 1
+  store i32 %".36", i32* %"pow_counter.2"
+  br label %"pow_loop_cond.2"
+pow_loop_end.2:
+  %"pow_result_val.2" = load i32, i32* %"pow_result.2"
+  %"pow_result.3" = alloca i32
+  store i32 1, i32* %"pow_result.3"
+  %"pow_counter.3" = alloca i32
+  store i32 %"pow_result_val.2", i32* %"pow_counter.3"
+  br label %"pow_loop_cond.3"
+pow_loop_cond.3:
+  %".42" = load i32, i32* %"pow_counter.3"
+  %".43" = icmp sgt i32 %".42", 0
+  br i1 %".43", label %"pow_loop_body.3", label %"pow_loop_end.3"
+pow_loop_body.3:
+  %".45" = load i32, i32* %"pow_result.3"
+  %".46" = mul i32 %".45", 2
+  store i32 %".46", i32* %"pow_result.3"
+  %".48" = sub i32 %".42", 1
+  store i32 %".48", i32* %"pow_counter.3"
+  br label %"pow_loop_cond.3"
+pow_loop_end.3:
+  %"pow_result_val.3" = load i32, i32* %"pow_result.3"
   %"i_val" = load i32, i32* %"i"
   ret i32 %"i_val"
 }

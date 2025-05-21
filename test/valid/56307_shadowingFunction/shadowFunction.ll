@@ -11,12 +11,16 @@ entry:
   %"x_val" = load i32, i32* %"x_ptr"
   %"addtmp" = add i32 %"x_val", 10
   store i32 %"addtmp", i32* %"y"
+  %"x_val.1" = load i32, i32* %"x_ptr"
+  %"addtmp.1" = add i32 %"x_val.1", 10
   %"x.1" = alloca i32
   %"y_val" = load i32, i32* %"y"
   %"multmp" = mul i32 %"y_val", 2
   store i32 %"multmp", i32* %"x.1"
-  %"x_val.1" = load i32, i32* %"x.1"
-  ret i32 %"x_val.1"
+  %"y_val.1" = load i32, i32* %"y"
+  %"multmp.1" = mul i32 %"y_val.1", 2
+  %"x_val.2" = load i32, i32* %"x.1"
+  ret i32 %"x_val.2"
 }
 
 define void @"aguda_main"()

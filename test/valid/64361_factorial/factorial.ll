@@ -2,7 +2,7 @@
 target triple = "arm64-apple-darwin22.6.0"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
 
-define i32 @"factorial"(i32 %"n")
+define i32 @"fact"(i32 %"n")
 {
 entry:
   %"n_ptr" = alloca i32
@@ -16,8 +16,8 @@ else:
   %"n_val.1" = load i32, i32* %"n_ptr"
   %"n_val.2" = load i32, i32* %"n_ptr"
   %"subtmp" = sub i32 %"n_val.2", 1
-  %"factorial_call" = call i32 @"factorial"(i32 %"subtmp")
-  %"multmp" = mul i32 %"n_val.1", %"factorial_call"
+  %"fact_call" = call i32 @"fact"(i32 %"subtmp")
+  %"multmp" = mul i32 %"n_val.1", %"fact_call"
   br label %"merge"
 merge:
   %"iftmp" = phi  i32 [1, %"then"], [%"multmp", %"else"]
@@ -27,9 +27,15 @@ merge:
 define void @"aguda_main"()
 {
 entry:
-  %"factorial_call" = call i32 @"factorial"(i32 5)
+  %"fact_call" = call i32 @"fact"(i32 5)
   %"fmtptr" = getelementptr [3 x i8], [3 x i8]* @".printf_fmt_int", i32 0, i32 0
-  %"printf_call" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr", i32 %"factorial_call")
+  %"printf_call" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr", i32 %"fact_call")
+  %"fact_call.1" = call i32 @"fact"(i32 0)
+  %"fmtptr.1" = getelementptr [3 x i8], [3 x i8]* @".printf_fmt_int", i32 0, i32 0
+  %"printf_call.1" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr.1", i32 %"fact_call.1")
+  %"fact_call.2" = call i32 @"fact"(i32 7)
+  %"fmtptr.2" = getelementptr [3 x i8], [3 x i8]* @".printf_fmt_int", i32 0, i32 0
+  %"printf_call.2" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr.2", i32 %"fact_call.2")
   ret void
 }
 

@@ -21,20 +21,32 @@ else:
 merge:
   %"iftmp" = phi  i32 [%"negtmp", %"then"], [%"n_val.2", %"else"]
   store i32 %"iftmp", i32* %"m"
-  %"m_val" = load i32, i32* %"m"
-  %"cmptmp.1" = icmp slt i32 %"m_val", 10
+  %"n_val.3" = load i32, i32* %"n_ptr"
+  %"cmptmp.1" = icmp slt i32 %"n_val.3", 0
   br i1 %"cmptmp.1", label %"then.1", label %"else.1"
 then.1:
+  %"n_val.4" = load i32, i32* %"n_ptr"
+  %"negtmp.1" = sub i32 0, %"n_val.4"
   br label %"merge.1"
 else.1:
+  %"n_val.5" = load i32, i32* %"n_ptr"
+  br label %"merge.1"
+merge.1:
+  %"iftmp.1" = phi  i32 [%"negtmp.1", %"then.1"], [%"n_val.5", %"else.1"]
+  %"m_val" = load i32, i32* %"m"
+  %"cmptmp.2" = icmp slt i32 %"m_val", 10
+  br i1 %"cmptmp.2", label %"then.2", label %"else.2"
+then.2:
+  br label %"merge.2"
+else.2:
   %"m_val.1" = load i32, i32* %"m"
   %"divtmp" = sdiv i32 %"m_val.1", 10
   %"digits_call" = call i32 @"digits"(i32 %"divtmp")
   %"addtmp" = add i32 1, %"digits_call"
-  br label %"merge.1"
-merge.1:
-  %"iftmp.1" = phi  i32 [1, %"then.1"], [%"addtmp", %"else.1"]
-  ret i32 %"iftmp.1"
+  br label %"merge.2"
+merge.2:
+  %"iftmp.2" = phi  i32 [1, %"then.2"], [%"addtmp", %"else.2"]
+  ret i32 %"iftmp.2"
 }
 
 define void @"aguda_main"()

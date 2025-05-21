@@ -11,12 +11,14 @@ entry:
   %"x_val" = load i32, i32* %"x"
   %"addtmp" = add i32 %"x_val", 2
   store i32 %"addtmp", i32* %"y"
+  %"x_val.1" = load i32, i32* %"x"
+  %"addtmp.1" = add i32 %"x_val.1", 2
   %"y_val" = load i32, i32* %"y"
   %"multmp" = mul i32 %"y_val", 2
-  %"x_val.1" = load i32, i32* %"x"
-  %"multmp.1" = mul i32 %"multmp", %"x_val.1"
   %"x_val.2" = load i32, i32* %"x"
-  %"multmp.2" = mul i32 %"multmp.1", %"x_val.2"
+  %"multmp.1" = mul i32 %"multmp", %"x_val.2"
+  %"x_val.3" = load i32, i32* %"x"
+  %"multmp.2" = mul i32 %"multmp.1", %"x_val.3"
   ret i32 %"multmp.2"
 }
 

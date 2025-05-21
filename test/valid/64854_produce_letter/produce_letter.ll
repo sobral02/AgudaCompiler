@@ -10,6 +10,7 @@ entry:
   %"l" = alloca i1
   %"letter_val" = load i1, i1* %"letter_ptr"
   store i1 %"letter_val", i1* %"l"
+  %"letter_val.1" = load i1, i1* %"letter_ptr"
   %"l_val" = load i1, i1* %"l"
   ret i1 %"l_val"
 }

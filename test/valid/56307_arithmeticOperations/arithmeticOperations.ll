@@ -55,11 +55,16 @@ entry:
   %"n_val" = load i32, i32* %"n_ptr"
   %"sumUp_call" = call i32 @"sumUp"(i32 %"n_val")
   store i32 %"sumUp_call", i32* %"s"
-  %"p" = alloca i32
   %"n_val.1" = load i32, i32* %"n_ptr"
+  %"sumUp_call.1" = call i32 @"sumUp"(i32 %"n_val.1")
+  %"p" = alloca i32
+  %"n_val.2" = load i32, i32* %"n_ptr"
   %"m_val" = load i32, i32* %"m_ptr"
-  %"product_call" = call i32 @"product"(i32 %"n_val.1", i32 %"m_val")
+  %"product_call" = call i32 @"product"(i32 %"n_val.2", i32 %"m_val")
   store i32 %"product_call", i32* %"p"
+  %"n_val.3" = load i32, i32* %"n_ptr"
+  %"m_val.1" = load i32, i32* %"m_ptr"
+  %"product_call.1" = call i32 @"product"(i32 %"n_val.3", i32 %"m_val.1")
   %"s_val" = load i32, i32* %"s"
   %"p_val" = load i32, i32* %"p"
   %"addtmp" = add i32 %"s_val", %"p_val"

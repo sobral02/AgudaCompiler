@@ -92,8 +92,8 @@ class LLVMCodeGenerator:
             if isinstance(llvm_type, ir.VoidType):
                 # Variável do tipo Unit → nada a fazer
                 self.named_values[var_name] = None
-                return
-
+                # Mesmo que seja Unit, continua a gerar a expr porque pode conter efeitos (ex: print)
+                return self.generate_code(node.expr)
             ptr = self.builder.alloca(llvm_type, name=var_name)
             self.named_values[var_name] = ptr
 
@@ -108,6 +108,10 @@ class LLVMCodeGenerator:
             if init_val_llvm is not None:
                 self.builder.store(init_val_llvm, ptr)
                 
+            # Se o corpo da declaração for outra declaração ou tiver efeitos (como um print), executa-o
+            return self.generate_code(node.expr)
+
+                
         else: # Variável global
             # Verificar se a expressão de inicialização é uma constante
             # Por agora, vamos permitir apenas literais como inicializadores globais
@@ -115,6 +119,12 @@ class LLVMCodeGenerator:
             initializer = None
             if isinstance(node.expr, aguda_ast.IntLiteral):
                 initializer = ir.Constant(llvm_type, node.expr.value)
+            elif (isinstance(node.expr, aguda_ast.UnaryOp) and
+                node.expr.op == '-' and
+                isinstance(node.expr.expr, aguda_ast.IntLiteral)):
+                # Trata "-2147483648" como constante
+                initializer = ir.Constant(llvm_type, -node.expr.expr.value)
+
             elif isinstance(node.expr, aguda_ast.BoolLiteral):
                 initializer = ir.Constant(llvm_type, 1 if node.expr.value else 0)
             elif isinstance(node.expr, aguda_ast.UnitLiteral) and llvm_type.is_void():
@@ -159,13 +169,16 @@ class LLVMCodeGenerator:
 
         # Criar lista de tipos LLVM (ignorando parâmetros Unit)
         llvm_param_types = []
-        param_map = []  # mapeia parâmetros válidos (não-Unit) para associar nomes
+        param_map = []  # parâmetros que serão realmente passados para o LLVM
+        unit_params = []  # parâmetros Unit, que não são passados mas precisam ser registados
 
         for param_name, aguda_type in zip(node.params, aguda_param_types):
             llvm_type = self.get_llvm_type(aguda_type)
             if not isinstance(llvm_type, ir.VoidType):
                 llvm_param_types.append(llvm_type)
                 param_map.append(param_name)
+            else:
+                unit_params.append(param_name)
 
         llvm_return_type = self.get_llvm_type(aguda_return_type)
 
@@ -197,6 +210,9 @@ class LLVMCodeGenerator:
             alloca = self.builder.alloca(llvm_arg.type, name=arg_name + "_ptr")
             self.builder.store(llvm_arg, alloca)
             self.named_values[arg_name] = alloca
+            
+        for unit_param in unit_params:
+            self.named_values[unit_param] = None  # Unit não tem valor, mas o nome precisa existir
 
         # Gerar o corpo da função
         if not hasattr(node.expr, "inferred_type") or node.expr.inferred_type is None:
@@ -282,22 +298,23 @@ class LLVMCodeGenerator:
 
 
     def generate_Var(self, node: aguda_ast.Var):
-        # Procurar a variável no escopo atual (named_values) ou global (func_symtab)
         if node.name in self.named_values:
-            # É uma variável local ou parâmetro, self.named_values[node.name] é um ponteiro (AllocaInst)
-            # Para usar o valor, precisamos carregá-lo.
-            return self.builder.load(self.named_values[node.name], name=node.name + "_val")
+            ptr = self.named_values[node.name]
+            if ptr is None:
+                return None  # Variável do tipo Unit → não há valor a carregar
+            return self.builder.load(ptr, name=node.name + "_val")
         elif node.name in self.func_symtab:
-            # Pode ser uma função global ou uma variável global
             global_val = self.func_symtab[node.name]
             if isinstance(global_val, ir.Function):
-                return global_val # Retorna o objeto função LLVM para chamadas
+                return global_val
             elif isinstance(global_val, ir.GlobalVariable):
-                # É uma variável global, precisamos carregá-la para usar o valor
                 return self.builder.load(global_val, name=node.name + "_global_val")
         else:
-            # Este caso não deveria acontecer se o validador funcionou corretamente
             raise NameError(f"Variável ou função desconhecida: {node.name}")
+
+        
+        
+    
 
 
     def generate_BinOp(self, node: aguda_ast.BinOp):
@@ -482,14 +499,36 @@ class LLVMCodeGenerator:
             # Assumir que print imprime um inteiro. Precisamos declarar 'printf'.
             printf_ty = ir.FunctionType(ir.IntType(32), [ir.IntType(8).as_pointer()], var_arg=True)
             try:
-                printf_func = self.module.get_global(b"printf")
+                printf_func = self.module.get_global("printf")
                 if not isinstance(printf_func, ir.Function): # Se já existe mas não é função
                     printf_func = ir.Function(self.module, printf_ty, name="printf")
             except KeyError: # Se não existe
                  printf_func = ir.Function(self.module, printf_ty, name="printf")
 
 
+            # Obtemos o tipo inferido do argumento
+            arg_type = self.validator.typeof(node.args[0])
             arg_val = self.generate_code(node.args[0])
+
+            #  Se for um print do tipo Unit (print(none)), imprimir "unit"
+            if isinstance(arg_type, UnitType):
+                if not hasattr(self, 'global_str_unit'):
+                    str_unit = ir.Constant(ir.ArrayType(ir.IntType(8), 6), bytearray(b"unit\n\0"))
+                    self.global_str_unit = ir.GlobalVariable(self.module, str_unit.type, name=".str_unit")
+                    self.global_str_unit.linkage = "internal"
+                    self.global_str_unit.global_constant = True
+                    self.global_str_unit.initializer = str_unit
+
+                unit_ptr = self.builder.gep(
+                    self.global_str_unit,
+                    [ir.Constant(ir.IntType(32), 0), ir.Constant(ir.IntType(32), 0)]
+                )
+                
+                
+
+
+                return self.builder.call(printf_func, [unit_ptr], name="printf_call_unit")
+
             
 
             if arg_val is None:
@@ -500,6 +539,7 @@ class LLVMCodeGenerator:
                     self.global_str_unit.linkage = "internal"
                     self.global_str_unit.global_constant = True
                     self.global_str_unit.initializer = str_unit
+                
 
                 unit_ptr = self.builder.gep(self.global_str_unit, [ir.Constant(ir.IntType(32), 0), ir.Constant(ir.IntType(32), 0)])
                 return self.builder.call(printf_func, [unit_ptr], name="printf_call_unit")
@@ -556,7 +596,7 @@ class LLVMCodeGenerator:
             # Para simplificar, criamos uma nova a cada chamada, ou melhor, uma única global.
             fmt_name = ".printf_fmt_int"
             try:
-                global_fmt = self.module.get_global(fmt_name.encode("utf-8"))
+                global_fmt = self.module.get_global(fmt_name)
             except KeyError:
                 global_fmt = ir.GlobalVariable(self.module, c_fmt_str.type, name=fmt_name)
                 global_fmt.linkage = "internal"
@@ -609,12 +649,20 @@ class LLVMCodeGenerator:
                 raise TypeError(f"Função '{func_name}' espera Unit, mas o argumento não é unit.")
             return self.builder.call(callee_func, [], name=func_name + "_call")
 
-        # Verificação normal
-        if len(node.args) != len(expected_args):
+        
+        # Gerar argumentos reais (não-Unit)
+        real_args = []
+        for arg_expr in node.args:
+            arg_type = self.validator.typeof(arg_expr)
+            if not isinstance(arg_type, UnitType):
+                real_args.append(arg_expr)
+
+        if len(real_args) != len(expected_args):
             raise TypeError(f"Número incorreto de argumentos para '{func_name}'")
 
+
         call_args = []
-        for i, arg_expr in enumerate(node.args):
+        for i, arg_expr in enumerate(real_args):
             arg_val = self.generate_code(arg_expr)
             expected_type = expected_args[i]
 
@@ -903,7 +951,7 @@ class LLVMCodeGenerator:
                 # Então: vamos assumir que `main` retornou Unit e não houve `print`.
                 # A forma prática de saber se `call_result` é None e não tem valor a propagar é simplesmente verificar.
 
-                # ⚠️ Aqui está a chave:
+                #  Aqui está a chave:
                 if call_result is None:
                     # Não houve print nem valor útil → assumimos que foi silêncio → imprimimos "unit"
                     if not hasattr(self, 'global_str_unit'):
@@ -998,6 +1046,8 @@ class LLVMCodeGenerator:
             ret_val = self.builder.call(wrapper_func, [])
             self.builder.ret(ret_val)
             self.builder = None
+            
+    
 
         
 # --- Fim da classe LLVMCodeGenerator ---
@@ -1013,19 +1063,18 @@ def generate_llvm_code(ast_root, validator_instance, output_filename):
     print("DEBUG: func_symtab antes da geração de funções:", code_generator.func_symtab)  # PRINT 13
 
     
-    # Primeiro, gerar código para todas as declarações (FunDecls, VarDecls globais)
-    # Isto preenche func_symtab e define funções e globais no módulo.
-    # Primeiro, gerar código para todas as declarações de função
-    for decl in ast_root.declarations:
-        if isinstance(decl, aguda_ast.FunDecl):
-            code_generator.generate_code(decl)
 
-    print("DEBUG: func_symtab depois da geração de funções:", code_generator.func_symtab)  # PRINT 14
-
-    
-     # Agora, gerar código para todas as outras declarações (ex: VarDecl globais)
+     # Primeiro, gerar código para todas as declarações globais (VarDecls)
     for decl in ast_root.declarations:
         if not isinstance(decl, aguda_ast.FunDecl):
+            code_generator.generate_code(decl)
+            
+    print("DEBUG: func_symtab depois da geração de funções:", code_generator.func_symtab)  # PRINT 14
+   
+
+    # Agora, gerar código para todas as funções (FunDecls)
+    for decl in ast_root.declarations:
+        if isinstance(decl, aguda_ast.FunDecl):
             code_generator.generate_code(decl)
         
     # Depois, criar a função 'main' do LLVM que pode chamar a 'main' da AGUDA

@@ -38,6 +38,7 @@ merge:
   %"tmp" = alloca i32
   %"i_val" = load i32, i32* %"i"
   store i32 %"i_val", i32* %"tmp"
+  %"i_val.1" = load i32, i32* %"i"
   %"j_val.3" = load i32, i32* %"j"
   store i32 %"j_val.3", i32* %"i"
   %"tmp_val" = load i32, i32* %"tmp"

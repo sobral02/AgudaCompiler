@@ -2,27 +2,18 @@
 target triple = "arm64-apple-darwin22.6.0"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
 
-define void @"storeWhile"(i32 %"n")
+define void @"countForever"(i32 %"n")
 {
 entry:
   %"n_ptr" = alloca i32
   store i32 %"n", i32* %"n_ptr"
-  %"i" = alloca i32
-  %"n_val" = load i32, i32* %"n_ptr"
-  store i32 %"n_val", i32* %"i"
-  %"n_val.1" = load i32, i32* %"n_ptr"
   br label %"loop.cond"
 loop.cond:
-  %"i_val" = load i32, i32* %"i"
-  %"cmptmp" = icmp sgt i32 %"i_val", 0
-  br i1 %"cmptmp", label %"loop.body", label %"loop.end"
+  br i1 0, label %"loop.body", label %"loop.end"
 loop.body:
-  %"i_val.1" = load i32, i32* %"i"
+  %"n_val" = load i32, i32* %"n_ptr"
   %"fmtptr" = getelementptr [3 x i8], [3 x i8]* @".printf_fmt_int", i32 0, i32 0
-  %"printf_call" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr", i32 %"i_val.1")
-  %"i_val.2" = load i32, i32* %"i"
-  %"subtmp" = sub i32 %"i_val.2", 1
-  store i32 %"subtmp", i32* %"i"
+  %"printf_call" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr", i32 %"n_val")
   br label %"loop.cond"
 loop.end:
   ret void
@@ -34,10 +25,13 @@ declare i32 @"printf"(i8* %".1", ...)
 define void @"aguda_main"()
 {
 entry:
-  call void @"storeWhile"(i32 3)
+  call void @"countForever"(i32 10)
+  %".2" = getelementptr [6 x i8], [6 x i8]* @".str_unit", i32 0, i32 0
+  %"printf_call_unit" = call i32 (i8*, ...) @"printf"(i8* %".2")
   ret void
 }
 
+@".str_unit" = internal constant [6 x i8] c"unit\0a\00"
 define i32 @"wrapper_main"()
 {
 entry:

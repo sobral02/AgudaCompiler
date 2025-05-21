@@ -14,6 +14,7 @@ entry:
   %"result" = alloca i32
   %"unitFunction_call" = call i32 @"unitFunction"()
   store i32 %"unitFunction_call", i32* %"result"
+  %"unitFunction_call.1" = call i32 @"unitFunction"()
   %"result_val" = load i32, i32* %"result"
   %"fmtptr" = getelementptr [3 x i8], [3 x i8]* @".printf_fmt_int", i32 0, i32 0
   %"printf_call" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr", i32 %"result_val")

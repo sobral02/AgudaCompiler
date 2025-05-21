@@ -14,6 +14,9 @@ entry:
   %"b_val" = load i32, i32* %"b_ptr"
   %"addtmp" = add i32 %"a_val", %"b_val"
   store i32 %"addtmp", i32* %"sum"
+  %"a_val.1" = load i32, i32* %"a_ptr"
+  %"b_val.1" = load i32, i32* %"b_ptr"
+  %"addtmp.1" = add i32 %"a_val.1", %"b_val.1"
   %"sum_val" = load i32, i32* %"sum"
   ret i32 %"sum_val"
 }
