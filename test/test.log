@@ -294,11 +294,12 @@ expected: 233168
 captured: 3
 expected: 3
   /Users/vv/workspace/tcomp/aguda-testing/test/valid/64854_add/add.agu [✔]
-  /Users/vv/workspace/tcomp/aguda-testing/test/valid/64854_chess_matrix/chess_matrix.agu [✘]
 captured: 2
 expected: 2
   /Users/vv/workspace/tcomp/aguda-testing/test/valid/64854_coin_flip/coin_flip.agu [✔]
-  /Users/vv/workspace/tcomp/aguda-testing/test/valid/64854_heart/heart.agu [✘]
+captured: 17034604
+expected: 17034604
+  /Users/vv/workspace/tcomp/aguda-testing/test/valid/64854_heart/heart.agu [✔]
 captured: 1
 expected: 1
   /Users/vv/workspace/tcomp/aguda-testing/test/valid/64854_inc/inc.agu [✔]
@@ -377,8 +378,8 @@ expected: 64
 captured: -1712324607
 expected: -1712324607
   /Users/vv/workspace/tcomp/aguda-testing/test/valid/tcomp000_power-of-power/power-of-power.agu [✔]
-captured: 479001600
-expected: 479001600
+captured: 18
+expected: 18
 
   /Users/vv/workspace/tcomp/aguda-testing/test/valid/tcomp000_sumThree/sumThree.agu [✔]
 
@@ -391,7 +392,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_array_operations/array_operations.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_array_operations/array_operations.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   2) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_bool_array/bool_array.agu
@@ -400,7 +401,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_bool_array/bool_array.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_bool_array/bool_array.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   3) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_uv_mapping/uv_mapping.agu
@@ -410,7 +411,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_uv_mapping/uv_mapping.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_uv_mapping/uv_mapping.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   4) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_zip/zip.agu
@@ -420,7 +421,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_zip/zip.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/54394_zip/zip.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   5) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/56269_bottomRow/bottomRow.agu
@@ -430,7 +431,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56269_bottomRow/bottomRow.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56269_bottomRow/bottomRow.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   6) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/56269_insertionSort/insertionSort.agu
@@ -439,7 +440,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56269_insertionSort/insertionSort.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56269_insertionSort/insertionSort.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   7) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/56307_applyTwiceFunction/applyTwiceFunction.agu
@@ -448,7 +449,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56307_applyTwiceFunction/applyTwiceFunction.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56307_applyTwiceFunction/applyTwiceFunction.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   8) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/56307_sumArrayFunction/sumArrayFunction.agu
@@ -457,7 +458,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56307_sumArrayFunction/sumArrayFunction.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56307_sumArrayFunction/sumArrayFunction.agu/" --seed 835165930
 
   src/CodeGen.hs:290:21: 
   9) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/56307_zeroLengthArray/zeroLengthArray.agu
@@ -466,7 +467,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:290:21 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56307_zeroLengthArray/zeroLengthArray.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56307_zeroLengthArray/zeroLengthArray.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   10) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/56311_high_order_function_type/high_order_func_type.agu
@@ -475,7 +476,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56311_high_order_function_type/high_order_func_type.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/56311_high_order_function_type/high_order_func_type.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   11) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_addOneValueToArray/addOneValueToArray.agu
@@ -484,7 +485,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_addOneValueToArray/addOneValueToArray.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_addOneValueToArray/addOneValueToArray.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   12) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_numOfEvenNumInArray/numOfEvenNumInArray.agu
@@ -493,7 +494,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_numOfEvenNumInArray/numOfEvenNumInArray.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_numOfEvenNumInArray/numOfEvenNumInArray.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   13) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_sumNumInArray/sumNumInArray.agu
@@ -502,7 +503,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_sumNumInArray/sumNumInArray.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_sumNumInArray/sumNumInArray.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   14) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_sumOfMinAndOfMaxOfArray/sumOfMinAndOfMaxOfArray.agu
@@ -511,7 +512,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_sumOfMinAndOfMaxOfArray/sumOfMinAndOfMaxOfArray.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58168_sumOfMinAndOfMaxOfArray/sumOfMinAndOfMaxOfArray.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   15) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/58185_bubble_sort/bubble_sort.agu
@@ -530,7 +531,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58185_bubble_sort/bubble_sort.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58185_bubble_sort/bubble_sort.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   16) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/58185_mutual_recursion/mutual_recursion.agu
@@ -539,7 +540,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58185_mutual_recursion/mutual_recursion.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58185_mutual_recursion/mutual_recursion.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   17) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/58185_string_concatenation/string_concatenation.agu
@@ -551,7 +552,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58185_string_concatenation/string_concatenation.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/58185_string_concatenation/string_concatenation.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   18) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_array_sum/array_sum.agu
@@ -560,7 +561,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_array_sum/array_sum.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_array_sum/array_sum.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   19) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_count_vowels/count_vowels.agu
@@ -573,7 +574,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_count_vowels/count_vowels.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_count_vowels/count_vowels.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   20) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_exponential/exponential.agu
@@ -582,7 +583,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_exponential/exponential.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_exponential/exponential.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   21) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_reverse_array/reverse_array.agu
@@ -603,7 +604,7 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_reverse_array/reverse_array.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_reverse_array/reverse_array.agu/" --seed 835165930
 
   src/CodeGen.hs:293:24: 
   22) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_sum_function/sum_function.agu
@@ -619,28 +620,13 @@ Failures:
        CallStack (from HasCallStack):
          error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_sum_function/sum_function.agu/" --seed 1560497490
+  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64361_sum_function/sum_function.agu/" --seed 835165930
 
-  src/CodeGen.hs:293:24: 
-  23) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/64854_chess_matrix/chess_matrix.agu
-       uncaught exception: ErrorCall
-       Not implemented: Generating code for (29,1) declaration 'let _ : Unit =
-         printBoard(chessmatrix(8))'
-       CallStack (from HasCallStack):
-         error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
+Randomized with seed 835165930
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64854_chess_matrix/chess_matrix.agu/" --seed 1560497490
+Finished in 1.8596 seconds
+136 examples, 22 failures
 
-  src/CodeGen.hs:293:24: 
-  24) Valid Aguda Programs /Users/vv/workspace/tcomp/aguda-testing/test/valid/64854_heart/heart.agu
-       uncaught exception: ErrorCall
-       Not implemented: Generating code for (24,11) expression '"Love Aguda!\n"'
-       CallStack (from HasCallStack):
-         error, called at src/CodeGen.hs:293:24 in aguda-0.1.0.0-JiRc3g1Z34X3bcTeIEsxLY:CodeGen
 
-  To rerun use: --match "/Valid Aguda Programs//Users/vv/workspace/tcomp/aguda-testing/test/valid/64854_heart/heart.agu/" --seed 1560497490
 
-Randomized with seed 1560497490
 
-Finished in 1.8771 seconds
-138 examples, 24 failures

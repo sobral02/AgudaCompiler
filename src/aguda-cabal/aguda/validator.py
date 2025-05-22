@@ -81,7 +81,7 @@ class Validator:
                 else:
                     expr_text = "<source line unavailable>"
 
-            self.errors.append(f"Error: ({lineno},{col}) {msg}\n{expr_text}")
+            self.errors.append(f"\nError: ({lineno},{col}) {msg}\n{expr_text}")
 
 
 

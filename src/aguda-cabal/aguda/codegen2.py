@@ -29,7 +29,7 @@ class LLVMCodeGenerator:
             #mudar o unit para i1 e o bool para i8
         }
 
-    def get_llvm_type(self, aguda_type_node, node=None):
+    def get_llvm_type(self, aguda_type_node):
         """Converte um nó de tipo AGUDA (do AST ou do Validator) para um tipo LLVM."""
         type_str = str(aguda_type_node)  # Usa a representação string do seu tipo
 
@@ -46,14 +46,10 @@ class LLVMCodeGenerator:
             print(f"DEBUG: Tipo de função gerado: {llvm_type}")  # PRINT 3
             return llvm_type
         else:
-            if node and hasattr(self.validator, "error"):
-                self.validator.error(node, f"Not implemented: Generating code for type '{str(aguda_type_node)}'")
-                msg = self.validator.errors[-1]  # Pega a última mensagem gerada
-                raise NotImplementedError(msg)
-            else:
-                raise NotImplementedError(f"Tipo AGUDA não mapeado para LLVM: {aguda_type_node}")
-            
-            
+            print(f" Tipo não mapeado: {aguda_type_node}")  # PRINT 4
+            raise NotImplementedError(f"Tipo AGUDA não mapeado para LLVM: {aguda_type_node} ")
+
+
     def generate_code(self, node):
         """Método principal para gerar código para um nó da AST."""
         if isinstance(node, aguda_ast.FunDecl):
@@ -93,8 +89,7 @@ class LLVMCodeGenerator:
 
         var_name = node.name
         aguda_type = self.validator._type_from_ast(node.type) # Obter o tipo validado
-        llvm_type = self.get_llvm_type(aguda_type, node=node)
-
+        llvm_type = self.get_llvm_type(aguda_type)
 
         if self.builder:  # Dentro de uma função (variável local)
             if isinstance(llvm_type, ir.VoidType):
@@ -178,14 +173,14 @@ class LLVMCodeGenerator:
         unit_params = []  # parâmetros Unit, que não são passados mas precisam ser registados
 
         for param_name, aguda_type in zip(node.params, aguda_param_types):
-            llvm_type = self.get_llvm_type(aguda_type, node=node)
+            llvm_type = self.get_llvm_type(aguda_type)
             if not isinstance(llvm_type, ir.VoidType):
                 llvm_param_types.append(llvm_type)
                 param_map.append(param_name)
             else:
                 unit_params.append(param_name)
 
-        llvm_return_type = self.get_llvm_type(aguda_return_type,node=node)
+        llvm_return_type = self.get_llvm_type(aguda_return_type)
 
         print(f"DEBUG: generate_FunDecl - nome da função: {func_name}")
         print(f"DEBUG: generate_FunDecl - tipos AGUDA dos parâmetros: {aguda_param_types}")
@@ -743,7 +738,7 @@ class LLVMCodeGenerator:
         if_expr_aguda_type = getattr(node, "inferred_type", None)
         if if_expr_aguda_type is None:
             raise RuntimeError("IfExpr não tem tipo inferido do validador.") # O validador garante t1 e t2 são iguais
-        llvm_if_type = self.get_llvm_type(if_expr_aguda_type, node=node)
+        llvm_if_type = self.get_llvm_type(if_expr_aguda_type)
 
         if llvm_if_type == ir.VoidType():
             return None # Nada a retornar para o PHI se o tipo for Unit/void
@@ -893,10 +888,10 @@ class LLVMCodeGenerator:
 
     # Arrays e NewArray/ArrayAccess estão excluídos para M4.
     def generate_NewArray(self, node: aguda_ast.NewArray):
-        raise NotImplementedError(f"Not implemented: Generating code for ({node.lineno},{node.col}) expression '{(node)}'")
+        raise NotImplementedError(f"Not implemented: Generating code for ({node.lineno},{node.col}) expression '{str(node)}' - NewArray.")
 
     def generate_ArrayAccess(self, node: aguda_ast.ArrayAccess):
-        raise NotImplementedError(f"Not implemented: Generating code for ({node.lineno},{node.col}) expression '{str(node)}'")
+        raise NotImplementedError(f"Not implemented: Generating code for ({node.lineno},{node.col}) expression '{str(node)}' - ArrayAccess.")
 
     # O seu parser tem `p_declaration_var` que pode ter um `block` ou `statement_list`
     # como `var_body`. O `build_seq` transforma `statement_list` em `Seq`.
@@ -1070,11 +1065,10 @@ def generate_llvm_code(ast_root, validator_instance, output_filename):
             if not validated_func_info:
                 continue  # Isso não deve acontecer se o validador estiver correto
             aguda_param_types, aguda_return_type = validated_func_info
-            llvm_param_types = [code_generator.get_llvm_type(t, node=decl)
+            llvm_param_types = [code_generator.get_llvm_type(t)
                                 for t in aguda_param_types
                                 if not isinstance(code_generator.get_llvm_type(t), ir.VoidType)]
-
-            llvm_return_type = code_generator.get_llvm_type(aguda_return_type, node=decl)
+            llvm_return_type = code_generator.get_llvm_type(aguda_return_type)
             fnty = ir.FunctionType(llvm_return_type, llvm_param_types)
             llvm_func_name = func_name if func_name != "main" else "aguda_main"
             func = ir.Function(code_generator.module, fnty, name=llvm_func_name)
