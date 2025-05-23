@@ -331,13 +331,14 @@ class Validator:
             if not isinstance(cond, BoolType):
                 self.error(expr.cond, f"If condition must be Bool")
 
-            self.ctx.append({})
+            self.ctx.append(self.ctx[-1].copy())
             t1 = self.typeof(expr.then_expr)
             self.ctx.pop()
 
-            self.ctx.append({})
+            self.ctx.append(self.ctx[-1].copy())
             t2 = self.typeof(expr.else_expr)
             self.ctx.pop()
+
             
             print(f"DEBUG VALIDATOR: IfExpr => then: {t1}, else: {t2}, cond: {cond}")
 
@@ -346,13 +347,20 @@ class Validator:
                 expr.inferred_type = ErrorType()
                 return ErrorType()
 
-            if t1 != t2:
-                self.error(expr, f"Branches must have same type, got {t1} and {t2}")
+            if t1 == t2:
+                expr.inferred_type = t1
+                return t1
+            elif isinstance(t1, UnitType):
+                expr.inferred_type = t2
+                return t2
+            elif isinstance(t2, UnitType):
+                expr.inferred_type = t1
+                return t1
+            else:
+                self.error(expr, f"Branches have incompatible types: {t1} and {t2}")
                 expr.inferred_type = ErrorType()
                 return ErrorType()
-            
-            expr.inferred_type = t1
-            return t1
+
 
 
         if isinstance(expr, ast.WhileExpr):

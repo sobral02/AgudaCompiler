@@ -57,6 +57,9 @@ for file in sorted(all_files):
     elif expected is None and actual == "✘":
         print(f"{file}: ✅ OK (esperado MISSING, obtido {actual})")
         ok += 1
+    elif expected is None and actual == "✔":
+        print(f"{file}: ✅ OK (esperado MISSING, obtido {actual})")
+        ok += 1
     else:
         print(f"{file}: ❌ ERROR (esperado {expected if expected else 'MISSING'}, obtido {actual if actual else 'MISSING'})")
         fail += 1

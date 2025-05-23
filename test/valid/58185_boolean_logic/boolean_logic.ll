@@ -40,37 +40,29 @@ print_end.1:
 define void @"aguda_main"()
 {
 entry:
-  br i1 1, label %"and_else", label %"and_then"
-and_then:
-  br label %"and_merge"
-and_else:
+  br i1 1, label %"and_rhs", label %"and_merge"
+and_rhs:
   br label %"and_merge"
 and_merge:
-  %"and_result" = phi  i1 [0, %"and_then"], [1, %"and_else"]
+  %"and_result" = phi  i1 [0, %"entry"], [1, %"and_rhs"]
   call void @"printBool"(i1 %"and_result")
-  br i1 1, label %"and_else.1", label %"and_then.1"
-and_then.1:
-  br label %"and_merge.1"
-and_else.1:
+  br i1 1, label %"and_rhs.1", label %"and_merge.1"
+and_rhs.1:
   br label %"and_merge.1"
 and_merge.1:
-  %"and_result.1" = phi  i1 [0, %"and_then.1"], [0, %"and_else.1"]
+  %"and_result.1" = phi  i1 [0, %"and_merge"], [0, %"and_rhs.1"]
   call void @"printBool"(i1 %"and_result.1")
-  br i1 1, label %"or_then", label %"or_else"
-or_then:
-  br label %"or_merge"
-or_else:
+  br i1 1, label %"or_merge", label %"or_rhs"
+or_rhs:
   br label %"or_merge"
 or_merge:
-  %"or_result" = phi  i1 [1, %"or_then"], [0, %"or_else"]
+  %"or_result" = phi  i1 [1, %"and_merge.1"], [0, %"or_rhs"]
   call void @"printBool"(i1 %"or_result")
-  br i1 0, label %"or_then.1", label %"or_else.1"
-or_then.1:
-  br label %"or_merge.1"
-or_else.1:
+  br i1 0, label %"or_merge.1", label %"or_rhs.1"
+or_rhs.1:
   br label %"or_merge.1"
 or_merge.1:
-  %"or_result.1" = phi  i1 [1, %"or_then.1"], [0, %"or_else.1"]
+  %"or_result.1" = phi  i1 [1, %"or_merge"], [0, %"or_rhs.1"]
   call void @"printBool"(i1 %"or_result.1")
   %"nottmp" = icmp eq i1 1, 0
   call void @"printBool"(i1 %"nottmp")

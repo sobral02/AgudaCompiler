@@ -12,13 +12,14 @@ entry:
   %"x_val.1" = load i32, i32* %"x_ptr"
   %"subtmp" = sub i32 %"x_val.1", 1
   %"odd_call" = call i1 @"odd"(i32 %"subtmp")
-  br i1 %"cmptmp", label %"or_then", label %"or_else"
-or_then:
-  br label %"or_merge"
-or_else:
+  br i1 %"cmptmp", label %"or_merge", label %"or_rhs"
+or_rhs:
+  %"x_val.2" = load i32, i32* %"x_ptr"
+  %"subtmp.1" = sub i32 %"x_val.2", 1
+  %"odd_call.1" = call i1 @"odd"(i32 %"subtmp.1")
   br label %"or_merge"
 or_merge:
-  %"or_result" = phi  i1 [1, %"or_then"], [%"odd_call", %"or_else"]
+  %"or_result" = phi  i1 [1, %"entry"], [%"odd_call.1", %"or_rhs"]
   ret i1 %"or_result"
 }
 
@@ -32,13 +33,14 @@ entry:
   %"x_val.1" = load i32, i32* %"x_ptr"
   %"subtmp" = sub i32 %"x_val.1", 1
   %"even_call" = call i1 @"even"(i32 %"subtmp")
-  br i1 %"cmptmp", label %"and_else", label %"and_then"
-and_then:
-  br label %"and_merge"
-and_else:
+  br i1 %"cmptmp", label %"and_rhs", label %"and_merge"
+and_rhs:
+  %"x_val.2" = load i32, i32* %"x_ptr"
+  %"subtmp.1" = sub i32 %"x_val.2", 1
+  %"even_call.1" = call i1 @"even"(i32 %"subtmp.1")
   br label %"and_merge"
 and_merge:
-  %"and_result" = phi  i1 [0, %"and_then"], [%"even_call", %"and_else"]
+  %"and_result" = phi  i1 [0, %"entry"], [%"even_call.1", %"and_rhs"]
   ret i1 %"and_result"
 }
 

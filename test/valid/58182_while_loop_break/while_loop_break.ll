@@ -19,7 +19,7 @@ loop.cond:
   %"limit_val" = load i32, i32* %"limit"
   %"cmptmp" = icmp slt i32 %"i_val", %"limit_val"
   %"flag_val" = load i1, i1* %"flag"
-  br i1 %"cmptmp", label %"and_else", label %"and_then"
+  br i1 %"cmptmp", label %"and_rhs", label %"and_merge"
 loop.body:
   %"i_val.1" = load i32, i32* %"i"
   %"breakCondition_val" = load i32, i32* %"breakCondition"
@@ -27,12 +27,11 @@ loop.body:
   br i1 %"cmptmp.1", label %"then", label %"else"
 loop.end:
   ret void
-and_then:
-  br label %"and_merge"
-and_else:
+and_rhs:
+  %"flag_val.1" = load i1, i1* %"flag"
   br label %"and_merge"
 and_merge:
-  %"and_result" = phi  i1 [0, %"and_then"], [%"flag_val", %"and_else"]
+  %"and_result" = phi  i1 [0, %"loop.cond"], [%"flag_val.1", %"and_rhs"]
   br i1 %"and_result", label %"loop.body", label %"loop.end"
 then:
   store i1 0, i1* %"flag"

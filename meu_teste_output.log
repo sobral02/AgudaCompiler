@@ -8,11 +8,17 @@
 === Running tcomp000_lookup/lookup.agu ===
 ✅ OK
 
+=== Running tcomp000-scope-leave/tcomp000-scope-leave.agu ===
+❌ ERROR
+
 === Running tcomp000_lookupRec/lookupRec.agu ===
 ✅ OK
 
 === Running tcomp000_collatz/collatz.agu ===
 ✅ OK
+
+=== Running tcomp000-scope-cond/tcomp000-scope-cond.agu ===
+❌ ERROR
 
 === Running tcomp000_evenOdd/evenOdd.agu ===
 ✅ OK
@@ -306,7 +312,7 @@
 ✅ OK
 
 === Running 58182_transpose_matrix/transpose_matrix.agu ===
-❌ ERROR
+✅ OK
 
 === Running 58170_factorial/factorial.agu ===
 ✅ OK

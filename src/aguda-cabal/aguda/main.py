@@ -36,13 +36,11 @@ def main():
         validator.validate(ast_root)
 
         print("\nValidation successful!")
-        #pretty_printer.print_ast(ast_root)
+        pretty_printer.print_ast(ast_root)
         print("\n")
 
         # Geração de código LLVM
-        print(f"Generating LLVM code to: {llvm_output_filename}")
         generate_llvm_code(ast_root, validator, llvm_output_filename)
-        print("DEBUG: generate_llvm_code retornou")
 
     except LexicalError as e:
         print(f"Lexical Error: {e}")

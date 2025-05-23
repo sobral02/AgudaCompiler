@@ -5,28 +5,24 @@ target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
 define void @"aguda_main"()
 {
 entry:
-  br i1 0, label %"and_else", label %"and_then"
-and_then:
-  br label %"and_merge"
-and_else:
+  br i1 0, label %"and_rhs", label %"and_merge"
+and_rhs:
   br label %"and_merge"
 and_merge:
-  %"and_result" = phi  i1 [0, %"and_then"], [1, %"and_else"]
-  br i1 %"and_result", label %"or_then", label %"or_else"
-or_then:
-  br label %"or_merge"
-or_else:
+  %"and_result" = phi  i1 [0, %"entry"], [1, %"and_rhs"]
+  br i1 %"and_result", label %"or_merge", label %"or_rhs"
+or_rhs:
   br label %"or_merge"
 or_merge:
-  %"or_result" = phi  i1 [1, %"or_then"], [1, %"or_else"]
+  %"or_result" = phi  i1 [1, %"and_merge"], [1, %"or_rhs"]
   br i1 %"or_result", label %"print_true", label %"print_false"
 print_true:
-  %".9" = getelementptr [5 x i8], [5 x i8]* @".str_true", i32 0, i32 0
-  %".10" = call i32 (i8*, ...) @"printf"(i8* %".9")
+  %".7" = getelementptr [5 x i8], [5 x i8]* @".str_true", i32 0, i32 0
+  %".8" = call i32 (i8*, ...) @"printf"(i8* %".7")
   br label %"print_end"
 print_false:
-  %".12" = getelementptr [6 x i8], [6 x i8]* @".str_false", i32 0, i32 0
-  %".13" = call i32 (i8*, ...) @"printf"(i8* %".12")
+  %".10" = getelementptr [6 x i8], [6 x i8]* @".str_false", i32 0, i32 0
+  %".11" = call i32 (i8*, ...) @"printf"(i8* %".10")
   br label %"print_end"
 print_end:
   ret void

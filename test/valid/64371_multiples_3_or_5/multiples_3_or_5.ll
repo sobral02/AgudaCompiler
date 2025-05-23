@@ -21,30 +21,31 @@ loop.body:
   %"i_val.2" = load i32, i32* %"i"
   %"remtmp.1" = srem i32 %"i_val.2", 5
   %"cmptmp.2" = icmp eq i32 %"remtmp.1", 0
-  br i1 %"cmptmp.1", label %"or_then", label %"or_else"
+  br i1 %"cmptmp.1", label %"or_merge", label %"or_rhs"
 loop.end:
   %"res_val.1" = load i32, i32* %"res"
   %"fmtptr" = getelementptr [3 x i8], [3 x i8]* @".printf_fmt_int", i32 0, i32 0
   %"printf_call" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr", i32 %"res_val.1")
   ret void
-or_then:
-  br label %"or_merge"
-or_else:
+or_rhs:
+  %"i_val.3" = load i32, i32* %"i"
+  %"remtmp.2" = srem i32 %"i_val.3", 5
+  %"cmptmp.3" = icmp eq i32 %"remtmp.2", 0
   br label %"or_merge"
 or_merge:
-  %"or_result" = phi  i1 [1, %"or_then"], [%"cmptmp.2", %"or_else"]
+  %"or_result" = phi  i1 [1, %"loop.body"], [%"cmptmp.3", %"or_rhs"]
   br i1 %"or_result", label %"then", label %"else"
 then:
   %"res_val" = load i32, i32* %"res"
-  %"i_val.3" = load i32, i32* %"i"
-  %"addtmp" = add i32 %"res_val", %"i_val.3"
+  %"i_val.4" = load i32, i32* %"i"
+  %"addtmp" = add i32 %"res_val", %"i_val.4"
   store i32 %"addtmp", i32* %"res"
   br label %"merge"
 else:
   br label %"merge"
 merge:
-  %"i_val.4" = load i32, i32* %"i"
-  %"addtmp.1" = add i32 %"i_val.4", 1
+  %"i_val.5" = load i32, i32* %"i"
+  %"addtmp.1" = add i32 %"i_val.5", 1
   store i32 %"addtmp.1", i32* %"i"
   br label %"loop.cond"
 }

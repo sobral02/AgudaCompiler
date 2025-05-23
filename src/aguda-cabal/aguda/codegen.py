@@ -33,17 +33,13 @@ class LLVMCodeGenerator:
         """Converte um nó de tipo AGUDA (do AST ou do Validator) para um tipo LLVM."""
         type_str = str(aguda_type_node)  # Usa a representação string do seu tipo
 
-        print(f"DEBUG: get_llvm_type chamada com aguda_type_node: {aguda_type_node}")  # PRINT 1
-
         if type_str in self.aguda_to_llvm_type_map:
             llvm_type = self.aguda_to_llvm_type_map[type_str]
-            print(f"DEBUG: Tipo encontrado no mapa: {llvm_type}")  # PRINT 2
             return llvm_type
         elif isinstance(aguda_type_node, FuncType):
             param_llvm_types = [self.get_llvm_type(pt) for pt in aguda_type_node.param_types]
             return_llvm_type = self.get_llvm_type(aguda_type_node.return_type)
             llvm_type = ir.FunctionType(return_llvm_type, param_llvm_types)
-            print(f"DEBUG: Tipo de função gerado: {llvm_type}")  # PRINT 3
             return llvm_type
         else:
             if node and hasattr(self.validator, "error"):
@@ -57,10 +53,8 @@ class LLVMCodeGenerator:
     def generate_code(self, node):
         """Método principal para gerar código para um nó da AST."""
         if isinstance(node, aguda_ast.FunDecl):
-            print(f"DEBUG: Gerando código para função: {node.name}")
             return self.generate_FunDecl(node)
         elif isinstance(node, aguda_ast.VarDecl):
-            print(f"DEBUG: Gerando código para variável: {node.name}")
             return self.generate_VarDecl(node)
         else:
             method_name = 'generate_' + node.__class__.__name__
@@ -186,12 +180,6 @@ class LLVMCodeGenerator:
                 unit_params.append(param_name)
 
         llvm_return_type = self.get_llvm_type(aguda_return_type,node=node)
-
-        print(f"DEBUG: generate_FunDecl - nome da função: {func_name}")
-        print(f"DEBUG: generate_FunDecl - tipos AGUDA dos parâmetros: {aguda_param_types}")
-        print(f"DEBUG: generate_FunDecl - tipos LLVM dos parâmetros: {llvm_param_types}")
-        print(f"DEBUG: generate_FunDecl - tipo de retorno LLVM: {llvm_return_type}")
-
         fnty = ir.FunctionType(llvm_return_type, llvm_param_types)
         llvm_func_name = func_name if func_name != "main" else "aguda_main"
 
@@ -229,12 +217,6 @@ class LLVMCodeGenerator:
 
         self.current_function_return_type = node.expr.inferred_type
         body_val = self.generate_code(node.expr)
-        print(f"[DEBUG] Função {node.name} → body_val = {body_val}, tipo: {getattr(body_val, 'type', 'None')}")
-
-        print(f"DEBUG: body_val da função '{func_name}' = {body_val}")
-        print(f"DEBUG: bloco atual terminado? {self.builder.block.is_terminated}")
-
-        print(f"DEBUG: generate_FunDecl - corpo da função: {body_val}")
 
         # Retorno da função
         if isinstance(llvm_return_type, ir.VoidType):
@@ -260,7 +242,6 @@ class LLVMCodeGenerator:
                 
         # Garantir que há um terminador, mesmo se o corpo não gerou retorno
         if not self.builder.block.is_terminated:
-            print(f"DEBUG: Bloco da função '{func_name}' não terminado, adicionando ret_void()")
             if isinstance(llvm_return_type, ir.VoidType):
                 self.builder.ret_void()
             else:
@@ -357,80 +338,52 @@ class LLVMCodeGenerator:
 
         # Operadores Lógicos (operam em i1 - Bool, retornam i1)
         elif node.op == '&&':
-            # LLVM não tem instruções 'and' e 'or' diretas que façam short-circuiting
-            # como em C/Java/AGUDA. O 'and' e 'or' do LLVM são bitwise.
-            # Para short-circuiting:
-            #   result = alloca i1
-            #   store false, result
-            #   cond_lhs = eval lhs
-            #   br cond_lhs, label %then, label %endif
-            # then:
-            #   cond_rhs = eval rhs
-            #   store cond_rhs, result
-            #   br label %endif
-            # endif:
-            #   return load result
-            # Esta é a forma correta, mas mais verbosa.
-            # Uma forma simples (bitwise, sem short-circuit) é `self.builder.and_(lhs, rhs)`.
-            # Vamos implementar o short-circuiting para '&&' e '||'.
+            current_func = self.builder.function
+            rhs_block = current_func.append_basic_block("and_rhs")
+            merge_block = current_func.append_basic_block("and_merge")
 
-            # Para && (AND lógico com short-circuit):
-            # Se lhs é falso, o resultado é falso, não avalia rhs.
-            # Se lhs é verdadeiro, o resultado é o valor de rhs.
-            start_block = self.builder.block
-            then_block = self.builder.append_basic_block(name="and_then")
-            else_block = self.builder.append_basic_block(name="and_else") # Não estritamente 'else', mas sim 'rhs_eval'
-            merge_block = self.builder.append_basic_block(name="and_merge")
+            lhs_block = self.builder.block  # Salva o bloco onde LHS foi avaliado
+            self.builder.cbranch(lhs, rhs_block, merge_block)
 
-            self.builder.cbranch(lhs, else_block, then_block) # Se lhs é true, vai para else_block (avaliar rhs)
-
-            # Bloco 'then' (lhs é falso)
-            self.builder.position_at_end(then_block)
-            val_lhs_false = ir.Constant(ir.IntType(1), 0) # Resultado é falso
+            # RHS só é avaliado se LHS for verdadeiro
+            self.builder.position_at_end(rhs_block)
+            rhs = self.generate_code(node.right)
             self.builder.branch(merge_block)
+            rhs_block_end = self.builder.block
 
-            # Bloco 'else' (lhs é verdadeiro, avaliar rhs)
-            self.builder.position_at_end(else_block)
-            # rhs já foi gerado, mas precisamos garantir que é gerado neste bloco se a AST for complexa
-            # No nosso caso, rhs já é um valor LLVM.
-            val_rhs_eval = rhs # Usamos o rhs já calculado.
-            self.builder.branch(merge_block)
-
-            # Bloco 'merge'
+            # Merge
             self.builder.position_at_end(merge_block)
             phi = self.builder.phi(ir.IntType(1), name="and_result")
-            phi.add_incoming(val_lhs_false, then_block)
-            phi.add_incoming(val_rhs_eval, else_block)
+            phi.add_incoming(ir.Constant(ir.IntType(1), 0), lhs_block)  
+            phi.add_incoming(rhs, rhs_block_end)
             return phi
+
 
 
         elif node.op == '||':
-            # Para || (OR lógico com short-circuit):
-            # Se lhs é verdadeiro, o resultado é verdadeiro, não avalia rhs.
-            # Se lhs é falso, o resultado é o valor de rhs.
-            start_block = self.builder.block
-            then_block = self.builder.append_basic_block(name="or_then") # lhs é verdadeiro
-            else_block = self.builder.append_basic_block(name="or_else")   # lhs é falso, avaliar rhs
-            merge_block = self.builder.append_basic_block(name="or_merge")
+            current_func = self.builder.function
+            rhs_block = current_func.append_basic_block("or_rhs")
+            merge_block = current_func.append_basic_block("or_merge")
 
-            self.builder.cbranch(lhs, then_block, else_block) # Se lhs é true, vai para then_block
+            lhs_block = self.builder.block  # salva o bloco atual onde LHS foi avaliado
 
-            # Bloco 'then' (lhs é verdadeiro)
-            self.builder.position_at_end(then_block)
-            val_lhs_true = ir.Constant(ir.IntType(1), 1) # Resultado é verdadeiro
+            self.builder.cbranch(lhs, merge_block, rhs_block)
+
+            # RHS só é avaliado se LHS for falso
+            self.builder.position_at_end(rhs_block)
+            rhs = self.generate_code(node.right)
             self.builder.branch(merge_block)
+            rhs_block_end = self.builder.block  
 
-            # Bloco 'else' (lhs é falso, avaliar rhs)
-            self.builder.position_at_end(else_block)
-            val_rhs_eval = rhs # Usamos o rhs já calculado
-            self.builder.branch(merge_block)
-
-            # Bloco 'merge'
+            # Merge
             self.builder.position_at_end(merge_block)
             phi = self.builder.phi(ir.IntType(1), name="or_result")
-            phi.add_incoming(val_lhs_true, then_block)
-            phi.add_incoming(val_rhs_eval, else_block)
+            phi.add_incoming(ir.Constant(ir.IntType(1), 1), lhs_block)   # LHS foi verdadeiro → resultado = true
+            phi.add_incoming(rhs, rhs_block_end)                         # LHS foi falso → resultado = RHS
             return phi
+
+
+
         
         elif node.op == '^':
             # Exponenciação inteira: base ^ exponent
@@ -636,9 +589,6 @@ class LLVMCodeGenerator:
 
         # Obter tipos esperados da função LLVM
         expected_args = list(callee_func.function_type.args)
-        print(f"Número de argumentos para '{func_name}' eh {len(expected_args)}")
-        if len(expected_args) != 0:
-            print(f"Tipos esperados para '{func_name}' eh {expected_args[0]}")
 
         # Caso especial: função Unit -> ... deve ter 0 argumentos em LLVM
         if len(expected_args) == 1 and isinstance(expected_args[0], ir.VoidType):
@@ -916,18 +866,13 @@ class LLVMCodeGenerator:
         Assume que a função 'main' da AGUDA já foi gerada.
         """
 
-        print("DEBUG: Entrando em create_main_wrapper")
+        
 
         # Procurar pela função 'main' da AGUDA
         aguda_main_func_ll = self.func_symtab.get("main") or self.module.get_global("aguda_main")
 
 
         if aguda_main_func_ll and isinstance(aguda_main_func_ll, ir.Function):
-            # Imprimir informações sobre a função AGUDA 'main'
-            print(f"DEBUG: Tentando chamar a função AGUDA main: {aguda_main_func_ll}")
-            print(f"DEBUG: Tipo da função AGUDA main: {aguda_main_func_ll.ftype}")
-            print(f"DEBUG: Tipos dos argumentos esperados pela AGUDA main: {aguda_main_func_ll.ftype.args}")
-
             # Definir o tipo da função 'main' do LLVM (int32 de retorno, sem argumentos)
             main_ret_type = ir.IntType(32)
             main_func_ty = ir.FunctionType(main_ret_type, [])
@@ -1086,7 +1031,7 @@ def generate_llvm_code(ast_root, validator_instance, output_filename):
         if not isinstance(decl, aguda_ast.FunDecl):
             code_generator.generate_code(decl)
             
-    print("DEBUG: func_symtab depois da geração de funções:", code_generator.func_symtab)  # PRINT 14
+    
    # Gerar os corpos das funções
     for decl in ast_root.declarations:
         if isinstance(decl, aguda_ast.FunDecl):
@@ -1095,10 +1040,7 @@ def generate_llvm_code(ast_root, validator_instance, output_filename):
         
     # Depois, criar a função 'main' do LLVM que pode chamar a 'main' da AGUDA
     # ou executar outra lógica para determinar o valor de saída do programa.
-    print("DEBUG: Chamando create_main_wrapper")  # PRINT 6
     code_generator.create_main_wrapper(ast_root)
-    print("DEBUG: create_main_wrapper retornou algo")  # PRINT 7
-
     llvm_ir_module = code_generator.module
 
     # Otimizações (opcional, mas bom para 'lli' e código final)

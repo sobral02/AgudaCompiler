@@ -95,36 +95,33 @@ pow_loop_end.3:
   %"multmp.3" = mul i32 3, %"pow_result_val.3"
   %"c" = alloca i1
   %"nottmp" = icmp eq i1 1, 0
-  br i1 0, label %"and_else", label %"and_then"
-and_then:
-  br label %"and_merge"
-and_else:
+  br i1 0, label %"and_rhs", label %"and_merge"
+and_rhs:
   br label %"and_merge"
 and_merge:
-  %"and_result" = phi  i1 [0, %"and_then"], [1, %"and_else"]
-  br i1 %"nottmp", label %"or_then", label %"or_else"
-or_then:
-  br label %"or_merge"
-or_else:
-  br label %"or_merge"
+  %"and_result" = phi  i1 [0, %"pow_loop_end.3"], [1, %"and_rhs"]
+  br i1 %"nottmp", label %"or_merge", label %"or_rhs"
+or_rhs:
+  br i1 0, label %"and_rhs.1", label %"and_merge.1"
 or_merge:
-  %"or_result" = phi  i1 [1, %"or_then"], [%"and_result", %"or_else"]
+  %"or_result" = phi  i1 [1, %"and_merge"], [%"and_result.1", %"and_merge.1"]
   store i1 %"or_result", i1* %"c"
   %"nottmp.1" = icmp eq i1 1, 0
-  br i1 0, label %"and_else.1", label %"and_then.1"
-and_then.1:
-  br label %"and_merge.1"
-and_else.1:
+  br i1 0, label %"and_rhs.2", label %"and_merge.2"
+and_rhs.1:
   br label %"and_merge.1"
 and_merge.1:
-  %"and_result.1" = phi  i1 [0, %"and_then.1"], [1, %"and_else.1"]
-  br i1 %"nottmp.1", label %"or_then.1", label %"or_else.1"
-or_then.1:
-  br label %"or_merge.1"
-or_else.1:
-  br label %"or_merge.1"
+  %"and_result.1" = phi  i1 [0, %"or_rhs"], [1, %"and_rhs.1"]
+  br label %"or_merge"
+and_rhs.2:
+  br label %"and_merge.2"
+and_merge.2:
+  %"and_result.2" = phi  i1 [0, %"or_merge"], [1, %"and_rhs.2"]
+  br i1 %"nottmp.1", label %"or_merge.1", label %"or_rhs.1"
+or_rhs.1:
+  br i1 0, label %"and_rhs.3", label %"and_merge.3"
 or_merge.1:
-  %"or_result.1" = phi  i1 [1, %"or_then.1"], [%"and_result.1", %"or_else.1"]
+  %"or_result.1" = phi  i1 [1, %"and_merge.2"], [%"and_result.3", %"and_merge.3"]
   %"a_val" = load i32, i32* %"a"
   %"fmtptr" = getelementptr [3 x i8], [3 x i8]* @".printf_fmt_int", i32 0, i32 0
   %"printf_call" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr", i32 %"a_val")
@@ -133,6 +130,11 @@ or_merge.1:
   %"printf_call.1" = call i32 (i8*, ...) @"printf"(i8* %"fmtptr.1", i32 %"b_val")
   %"c_val" = load i1, i1* %"c"
   br i1 %"c_val", label %"print_true", label %"print_false"
+and_rhs.3:
+  br label %"and_merge.3"
+and_merge.3:
+  %"and_result.3" = phi  i1 [0, %"or_rhs.1"], [1, %"and_rhs.3"]
+  br label %"or_merge.1"
 print_true:
   %".66" = getelementptr [5 x i8], [5 x i8]* @".str_true", i32 0, i32 0
   %".67" = call i32 (i8*, ...) @"printf"(i8* %".66")
