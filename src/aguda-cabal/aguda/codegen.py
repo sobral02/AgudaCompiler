@@ -92,7 +92,7 @@ class LLVMCodeGenerator:
 
         if self.builder:  # Dentro de uma função (variável local)
             if isinstance(llvm_type, ir.VoidType):
-                # Variável do tipo Unit → nada a fazer
+                # Variável do tipo Unit -> não faz nada
                 self.named_values[var_name] = None
                 # Mesmo que seja Unit, continua a gerar a expr porque pode conter efeitos (ex: print)
                 return self.generate_code(node.expr)
@@ -229,7 +229,7 @@ class LLVMCodeGenerator:
             if not self.builder.block.is_terminated:
                 self.builder.ret_void()
         elif body_val is not None and body_val.type != llvm_return_type:
-            # Tentativa de coerção simples (e.g., Bool → Int)
+            # Tentativa de coerção simples (e.g., Bool -> Int)
             if llvm_return_type == ir.IntType(32) and body_val.type == ir.IntType(1):
                 casted_val = self.builder.zext(body_val, llvm_return_type, name="bool_to_int")
                 self.builder.ret(casted_val)
@@ -284,7 +284,7 @@ class LLVMCodeGenerator:
         if node.name in self.named_values:
             ptr = self.named_values[node.name]
             if ptr is None:
-                return None  # Variável do tipo Unit → não há valor a carregar
+                return None  # Variável do tipo Unit -> não há valor a carregar
             return self.builder.load(ptr, name=node.name + "_val")
         elif node.name in self.func_symtab:
             global_val = self.func_symtab[node.name]
@@ -317,23 +317,10 @@ class LLVMCodeGenerator:
             return self.builder.sdiv(lhs, rhs, name='divtmp') # Divisão de inteiros com sinal
         elif node.op == '%':
             return self.builder.srem(lhs, rhs, name='remtmp') # Resto de inteiros com sinal
-        # POW (^) não é uma instrução LLVM direta. Pode ser implementada com uma chamada a uma função (e.g., llvm.pow.i32)
-        # ou um loop para inteiros. Para M4, se não for exigido pelos testes, pode ser omitido ou simplificado.
-        # Se POW for necessário:
-        # elif node.op == '^':
-        #     # Exemplo: chamar uma função intrínseca `llvm.pow.f64` se fossem floats,
-        #     # ou `llvm.powi.f64` para float^int. Para int^int, pode ser mais complexo.
-        #     # Para i32, uma chamada de função externa ou um loop seria mais apropriado.
-        #     # Por agora, vamos omitir para simplificar, assumindo que os testes não o usam intensivamente.
-        #     # Se for usado, precisaremos de uma função de biblioteca ou uma expansão em loop.
-        #     raise NotImplementedError("Operador POW (^) não implementado diretamente em LLVM. Requer função auxiliar.")
-
+        
 
         # Operadores de Comparação (retornam i1 - Bool)
         elif node.op in ['==', '!=', '<', '<=', '>', '>=']:
-            # `icmp_signed` para inteiros, `fcmp` para floats. AGUDA usa Int.
-            # O tipo de lhs e rhs deve ser o mesmo (garantido pelo validador).
-            # Se fossem bools (i1), a comparação ainda é `icmp`.
             return self.builder.icmp_signed(node.op, lhs, rhs, name='cmptmp')
 
         # Operadores Lógicos (operam em i1 - Bool, retornam i1)
@@ -378,8 +365,8 @@ class LLVMCodeGenerator:
             # Merge
             self.builder.position_at_end(merge_block)
             phi = self.builder.phi(ir.IntType(1), name="or_result")
-            phi.add_incoming(ir.Constant(ir.IntType(1), 1), lhs_block)   # LHS foi verdadeiro → resultado = true
-            phi.add_incoming(rhs, rhs_block_end)                         # LHS foi falso → resultado = RHS
+            phi.add_incoming(ir.Constant(ir.IntType(1), 1), lhs_block)   # LHS foi verdadeiro -> resultado = true
+            phi.add_incoming(rhs, rhs_block_end)                         # LHS foi falso -> resultado = RHS
             return phi
 
 
@@ -574,15 +561,11 @@ class LLVMCodeGenerator:
                 return self.builder.call(printf_func, [ptr_fmt, arg_val], name="printf_call")
 
 
-            # `print` em AGUDA retorna Unit, printf retorna int. O valor de retorno da chamada a printf é ignorado.
-            # O generate_code para a expressão que contém o print (e.g. Seq) tratará o tipo Unit.
-            # Retornar None aqui para indicar que o "valor" é Unit e já foi tratado.
-
 
         # Função definida pelo utilizador
         callee_func = self.func_symtab.get(func_name)
         if callee_func is None or not isinstance(callee_func, ir.Function):
-            # Pode ser uma variável do tipo função (não suportado diretamente em M4 sem ponteiros de função)
+            # Pode ser uma variável do tipo função (não suportado no M4)
             # Ou a função não foi declarada (validador deveria ter apanhado)
             # Para M4, assumimos que func_symtab contém ir.Function
             raise NameError(f"Função '{func_name}' não encontrada ou não é uma função LLVM.")
@@ -698,23 +681,9 @@ class LLVMCodeGenerator:
         if llvm_if_type == ir.VoidType():
             return None # Nada a retornar para o PHI se o tipo for Unit/void
         else:
-            # Se then_val ou else_val forem None (e.g., de um UnitLiteral),
-            # mas o tipo do if não é Unit, isso é um problema.
-            # O validador deve garantir que if then_val e else_val são compatíveis com llvm_if_type.
-            # Se then_val/else_val são None porque eram UnitLiteral e llvm_if_type não é void,
-            # precisamos de um valor placeholder ou o validador falhou.
-            # Assumindo que o validador garante tipos corretos:
+        
             if then_val is None and else_val is None and not llvm_if_type.is_void():
-                 # Isto não deveria acontecer se o tipo do if não for Unit.
-                 # Se o validador disse que o tipo do if é, por exemplo, Int,
-                 # então then_expr e else_expr deveriam ter resultado em valores Int.
-                 # Forçar um valor dummy do tipo correto para o PHI se for necessário.
-                 # print(f"AVISO: then_val e else_val são None para IfExpr, mas tipo esperado é {llvm_if_type}")
-                 # dummy_val = ir.Constant(llvm_if_type, None) # ou 0 para int, etc.
-                 # then_val = dummy_val
-                 # else_val = dummy_val
-                 # Mas isto é um sintoma de um problema anterior. O validador devia ter apanhado isto.
-                 # Ou o then_expr/else_expr eram sequências que terminavam em Unit.
+                 
                  pass # O validador garante que if t1=t2. Se t1 for Unit, não há phi.
 
             phi = self.builder.phi(llvm_if_type, name="iftmp")
@@ -732,36 +701,26 @@ class LLVMCodeGenerator:
             if then_val is not None and then_val.type != llvm_if_type:
                 if isinstance(then_val.type, ir.PointerType) and then_val.type.pointee == llvm_if_type:
                     then_val = self.builder.load(then_val, "", block=then_block_final) # Carregar no bloco de origem
-                # Adicionar mais conversões se necessário
+    
 
             if else_val is not None and else_val.type != llvm_if_type:
                  if isinstance(else_val.type, ir.PointerType) and else_val.type.pointee == llvm_if_type:
                     else_val = self.builder.load(else_val, "", block=else_block_final)
             
-            # Se depois de carregar, os tipos ainda não batem, ou se um é None e o tipo não é void,
-            # é um erro do validador ou da lógica de geração.
-            # Para M4, vamos assumir que os tipos são consistentes aqui.
-
+            
             if then_val is not None: phi.add_incoming(then_val, then_block_final)
             if else_val is not None: phi.add_incoming(else_val, else_block_final)
             
             # Se um dos caminhos (then ou else) não chega ao merge_block (e.g., tem um `ret`),
-            # o PHI node não deve ter uma entrada para ele. `llvmlite` pode lidar com isto,
-            # mas é bom estar ciente. Se o bloco não tem predecessor para `merge_block`,
-            # `add_incoming` pode falhar ou o verificador LLVM falhará.
-            # O `if not self.builder.block.is_terminated:` antes do `branch(merge_block)` ajuda.
-
-            # Se, após tudo, o phi não tem entradas (e.g., ambos os ramos retornaram),
-            # e o tipo não é void, o merge_block pode ser inalcançável.
+            # o PHI node não deve ter uma entrada para ele. 
+          
             if not phi.incomings and not llvm_if_type.is_void():
                 # Se o merge_block é alcançável mas o phi não tem entradas, é um erro.
                 # Se o merge_block não é alcançável (e.g. if true then ret 1 else ret 0),
-                # então o phi não importa. O builder.unreachable() pode ser usado.
-                # Por agora, se não há phi, mas esperávamos um valor, pode ser um problema.
-                # O código que usa o resultado deste if precisa lidar com `None` se o tipo for void.
+                # então o phi não importa. 
                 if merge_block.successors: # Se o merge_block continua
                     print(f"AVISO: PHI node para IfExpr não tem entradas mas o tipo é {llvm_if_type}")
-                    # Poderia retornar um undef ou valor padrão.
+                
                     return ir.Constant(llvm_if_type, None) # Undef value
             
             return phi
@@ -792,15 +751,11 @@ class LLVMCodeGenerator:
         self.builder.position_at_end(loop_end_block)
         
 
-
-        # While em AGUDA retorna Unit.
-        return None # Representa o valor Unit.
+        return None 
 
 
     def generate_Assign(self, node: aguda_ast.Assign):
-        # O alvo de uma atribuição (LHS) em AGUDA, para M4, é uma Var.
-        # Arrays estão excluídos.
-        # `node.target` é um `ast.Var` segundo o seu parser (`p_lvalue_var`).
+        
         target_name = node.target.name
         
         # Obter o ponteiro para a variável (deve ser um AllocaInst ou GlobalVariable)
@@ -822,9 +777,7 @@ class LLVMCodeGenerator:
             # Isto seria um erro de tipo que o validador AGUDA deveria apanhar.
             # (e.g. set bool_var = int_val). Por segurança:
             print(f"AVISO: Atribuição de Int para Bool para '{target_name}'. Validador deveria ter apanhado.")
-            # Poderia truncar: expr_val = self.builder.trunc(expr_val, ir.IntType(1))
-            # Ou usar icmp ne 0: expr_val = self.builder.icmp_signed('!=', expr_val, ir.Constant(ir.IntType(32),0))
-
+            
         # Armazenar o valor no ponteiro
         self.builder.store(expr_val, target_ptr)
 
@@ -841,22 +794,14 @@ class LLVMCodeGenerator:
         # O valor da sequência é o valor da segunda expressão.
         return self.generate_code(node.second)
 
-    # Arrays e NewArray/ArrayAccess estão excluídos para M4.
+    # Arrays e NewArray/ArrayAccess não implemntados no M4.
     def generate_NewArray(self, node: aguda_ast.NewArray):
         raise NotImplementedError(f"Not implemented: Generating code for ({node.lineno},{node.col}) expression '{(node)}'")
 
     def generate_ArrayAccess(self, node: aguda_ast.ArrayAccess):
         raise NotImplementedError(f"Not implemented: Generating code for ({node.lineno},{node.col}) expression '{str(node)}'")
 
-    # O seu parser tem `p_declaration_var` que pode ter um `block` ou `statement_list`
-    # como `var_body`. O `build_seq` transforma `statement_list` em `Seq`.
-    # Então, o `expr` de `VarDecl` pode ser um `Seq`.
-    # O `fun_body` também pode ser `statement_list` -> `Seq`.
-    # O gerador para `Seq` já está definido.
-    # Se o `expr` de `VarDecl` ou `FunDecl` for um `UnitLiteral` direto,
-    # `generate_UnitLiteral` retorna `None`.
-    # A lógica em `generate_FunDecl` e `generate_VarDecl` precisa lidar com `body_val` sendo `None`
-    # se o tipo de retorno/variável for Unit.
+
     
     # === Fim dos métodos de Geração ===
 
@@ -894,13 +839,10 @@ class LLVMCodeGenerator:
             if ret_ty == ir.VoidType():
                 call_result = self.builder.call(aguda_main_func_ll, args)
 
-                # Só imprimir "unit" se a chamada não for a um print nem tiver efeitos colaterais óbvios.
-                # Então: vamos assumir que `main` retornou Unit e não houve `print`.
-                # A forma prática de saber se `call_result` é None e não tem valor a propagar é simplesmente verificar.
+            
 
-                #  Aqui está a chave:
                 if call_result is None:
-                    # Não houve print nem valor útil → assumimos que foi silêncio → imprimimos "unit"
+                    # Não houve print nem valor útil -> assumimos que foi silêncio -> imprimimos "unit"
                     if not hasattr(self, 'global_str_unit'):
                         str_unit = ir.Constant(ir.ArrayType(ir.IntType(8), 6), bytearray(b"unit\n\0"))
                         self.global_str_unit = ir.GlobalVariable(self.module, str_unit.type, name=".str_unit")
@@ -993,8 +935,6 @@ class LLVMCodeGenerator:
             ret_val = self.builder.call(wrapper_func, [])
             self.builder.ret(ret_val)
             self.builder = None
-            
-    
 
         
 # --- Fim da classe LLVMCodeGenerator ---
@@ -1013,7 +953,7 @@ def generate_llvm_code(ast_root, validator_instance, output_filename):
             func_name = decl.name
             validated_func_info = validator_instance.functions.get(func_name)
             if not validated_func_info:
-                continue  # Isso não deve acontecer se o validador estiver correto
+                continue  
             aguda_param_types, aguda_return_type = validated_func_info
             llvm_param_types = [code_generator.get_llvm_type(t, node=decl)
                                 for t in aguda_param_types
@@ -1038,20 +978,11 @@ def generate_llvm_code(ast_root, validator_instance, output_filename):
             code_generator.generate_code(decl)
 
         
-    # Depois, criar a função 'main' do LLVM que pode chamar a 'main' da AGUDA
-    # ou executar outra lógica para determinar o valor de saída do programa.
+
     code_generator.create_main_wrapper(ast_root)
     llvm_ir_module = code_generator.module
 
-    # Otimizações (opcional, mas bom para 'lli' e código final)
-    # pm_builder = binding.PassManagerBuilder()
-    # pm_builder.opt_level = 2 # Nível de otimização (0-3)
-    # pass_manager = binding.ModulePassManager()
-    # pm_builder.populate(pass_manager)
-    # pass_manager.run(llvm_ir_module)
-
-
-    # Verificar o módulo LLVM (útil para depuração)
+    # Verificar o módulo LLVM (para debugging)
     try:
         llvm_ir = str(llvm_ir_module)
         llvm_module = binding.parse_assembly(llvm_ir)
@@ -1059,13 +990,10 @@ def generate_llvm_code(ast_root, validator_instance, output_filename):
     except RuntimeError as e:
         print("Erro na verificação do módulo LLVM:")
         print(str(llvm_ir_module)) # Imprimir o IR problemático
-        raise e # Relançar a exceção
+        raise e # lança a exceção
 
     # Escrever o código LLVM para um ficheiro .ll
     with open(output_filename, "w") as f:
         f.write(str(llvm_ir_module))
 
     print(f"Código LLVM gerado em: {output_filename}")
-    # print("---- LLVM IR ----")
-    # print(str(llvm_ir_module))
-    # print("-----------------")
